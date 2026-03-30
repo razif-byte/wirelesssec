@@ -17,10 +17,13 @@ from ..common.connection import ConnectionManager
 from ..common.chat import ChatManager
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-USER_STORE = os.path.join(BASE_DIR, "kali-app", "config", "users.json")
+USER_STORE = os.path.join(BASE_DIR, "config", "users.json")
 
 
 def ensure_user_store():
+    store_dir = os.path.dirname(USER_STORE)
+    if not os.path.exists(store_dir):
+        os.makedirs(store_dir, exist_ok=True)
     if not os.path.exists(USER_STORE):
         with open(USER_STORE, "w", encoding="utf-8") as handle:
             json.dump({"users": []}, handle)
