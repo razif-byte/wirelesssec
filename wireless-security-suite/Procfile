@@ -1,0 +1,1 @@
+web: python kali-app/app.py --serve

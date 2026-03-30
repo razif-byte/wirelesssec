@@ -26,4 +26,10 @@ Ia menumpukan kepada:
    ```
 3. Buka `http://127.0.0.1:5000` dan daftar akaun baru.
 
+## Deployment
+
+- Static website akan dideploy ke GitHub Pages melalui GitHub Actions dari folder `webapp/`.
+- Setelah workflow selesai, laman akan tersedia di `https://razif-byte.github.io/wirelesssec/`.
+- Untuk aplikasi backend, `Procfile` dan `Dockerfile` telah disediakan untuk deployment ke platform percuma seperti Railway, Render, atau Heroku.
+
 > Nota: alat ini direka untuk pemantauan dan pentadbiran yang sah sahaja. Jangan gunakan untuk mengganggu rangkaian atau peranti tanpa kebenaran.
