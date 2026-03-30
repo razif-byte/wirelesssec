@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Signup - Wireless Security Suite</title>
+  <style>
+    body {font-family: Arial, sans-serif; background:#121212; color:#fff; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0;}
+    .card {background:#1f1f1f; padding:24px; border-radius:12px; width:320px; box-shadow:0 8px 24px rgba(0,0,0,0.35);}
+    input, button {width:100%; margin:8px 0; padding:10px; border:none; border-radius:6px;}
+    input {background:#2b2b2b; color:#fff;}
+    button {background:#28a745; color:#fff; cursor:pointer;}
+    .link {text-align:center; margin-top:12px;}
+    a {color:#4da6ff; text-decoration:none;}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Signup</h2>
+    <form method="POST">
+      <input type="text" name="name" placeholder="Nama" required />
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="password" name="password" placeholder="Kata Laluan" required />
+      <button type="submit">Daftar</button>
+    </form>
+    <div class="link">
+      <p>Sudah ada akaun? <a href="/login">Login</a></p>
+    </div>
+  </div>
+</body>
+</html>

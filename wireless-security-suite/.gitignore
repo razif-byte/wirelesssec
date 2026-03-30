@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+venv/
+*.log
+*.db
+config/*.json
+kali-app/config/chat-history.json

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wireless Security Dashboard</title>
+  <style>
+    body {margin:0; font-family: Arial, sans-serif; background:#0d0f14; color:#f2f2f2;}
+    header {padding:16px 24px; background:#11131a; display:flex; justify-content:space-between; align-items:center;}
+    .container {padding:24px;}
+    .card {background:#141724; border:1px solid #222533; border-radius:14px; padding:18px; margin-bottom:18px;}
+    button {background:#3b82f6; border:none; color:#fff; border-radius:8px; padding:10px 16px; cursor:pointer;}
+    input, select, textarea {width:100%; margin-top:10px; padding:10px; border-radius:8px; border:1px solid #2b3448; background:#10131c; color:#fff;}
+    .grid {display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px;}
+    .status {font-size:0.95rem; color:#9ca3af;}
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Wireless Security Dashboard</h1>
+      <p class="status">User: {{ user.name }}</p>
+    </div>
+    <div>
+      <a href="/logout" style="color:#fff; text-decoration:none;">Logout</a>
+    </div>
+  </header>
+  <div class="container">
+    <div class="grid">
+      <div class="card">
+        <h2>Network Scan</h2>
+        <button onclick="scan('wifi')">Scan WiFi</button>
+        <button onclick="scan('bluetooth')">Scan Bluetooth</button>
+        <button onclick="scan('ble')">Scan BLE</button>
+        <button onclick="scan('gsm')">Scan GSM</button>
+        <button onclick="scan('lora')">Scan LoRa</button>
+        <button onclick="scan('rfid')">Scan RFID</button>
+        <pre id="scan-output" style="white-space:pre-wrap; margin-top:10px; max-height:240px; overflow:auto;"></pre>
+      </div>
+      <div class="card">
+        <h2>AI Monitoring</h2>
+        <button onclick="fetchAI()">Refresh AI Report</button>
+        <pre id="ai-output" style="white-space:pre-wrap; margin-top:10px; max-height:240px; overflow:auto;"></pre>
+      </div>
+      <div class="card">
+        <h2>Driver Manager</h2>
+        <button onclick="driverSearch()">Cari Driver</button>
+        <pre id="driver-output" style="white-space:pre-wrap; margin-top:10px; max-height:240px; overflow:auto;"></pre>
+      </div>
+      <div class="card">
+        <h2>Notifications</h2>
+        <textarea id="notify-message" rows="3" placeholder="Tulis mesej notifikasi..."></textarea>
+        <button onclick="sendNotification()">Hantar Notifikasi</button>
+      </div>
+      <div class="card">
+        <h2>Connection Host / Client</h2>
+        <button onclick="startHost()">Mula Host</button>
+        <input id="join-ip" type="text" placeholder="IP Address" />
+        <input id="join-port" type="number" placeholder="Port" value="9000" />
+        <input id="join-identity" type="text" placeholder="User ID / Email / Phone" />
+        <button onclick="joinClient()">Join Client</button>
+        <pre id="conn-output" style="white-space:pre-wrap; margin-top:10px; max-height:180px; overflow:auto;"></pre>
+      </div>
+      <div class="card">
+        <h2>Chat & Messenger</h2>
+        <textarea id="chat-text" rows="3" placeholder="Taip mesej..." ></textarea>
+        <button onclick="sendChat()">Hantar Chat</button>
+        <button onclick="fetchChat()">Segarkan Chat</button>
+        <pre id="chat-output" style="white-space:pre-wrap; margin-top:10px; max-height:240px; overflow:auto;"></pre>
+      </div>
+    </div>
+  </div>
+  <script>
+    async function scan(module) {
+      const response = await fetch(`/api/scan/${module}`);
+      document.getElementById('scan-output').textContent = JSON.stringify(await response.json(), null, 2);
+    }
+    async function fetchAI() {
+      const response = await fetch('/api/ai/status');
+      document.getElementById('ai-output').textContent = JSON.stringify(await response.json(), null, 2);
+    }
+    async function driverSearch() {
+      const response = await fetch('/api/driver/search');
+      document.getElementById('driver-output').textContent = JSON.stringify(await response.json(), null, 2);
+    }
+    async function sendNotification() {
+      const message = document.getElementById('notify-message').value;
+      const response = await fetch('/api/notify', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({message})});
+      alert((await response.json()).status);
+    }
+    async function startHost() {
+      const response = await fetch('/api/connection/host', {method:'POST'});
+      document.getElementById('conn-output').textContent = JSON.stringify(await response.json(), null, 2);
+    }
+    async function joinClient() {
+      const ip = document.getElementById('join-ip').value;
+      const port = document.getElementById('join-port').value;
+      const identity = document.getElementById('join-identity').value;
+      const response = await fetch('/api/connection/join', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ip, port, identity})});
+      document.getElementById('conn-output').textContent = JSON.stringify(await response.json(), null, 2);
+    }
+    async function sendChat() {
+      const text = document.getElementById('chat-text').value;
+      const response = await fetch('/api/chat/send', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({text})});
+      const data = await response.json();
+      document.getElementById('chat-output').textContent = JSON.stringify(data, null, 2);
+      fetchChat();
+    }
+    async function fetchChat() {
+      const response = await fetch('/api/chat/messages');
+      document.getElementById('chat-output').textContent = JSON.stringify(await response.json(), null, 2);
+    }
+    window.onload = fetchAI;
+  </script>
+</body>
+</html>
