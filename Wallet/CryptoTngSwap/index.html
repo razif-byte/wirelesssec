@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RazifWallet - Portable Version</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f4f7fb;
+            color: #102a43;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            min-height: 100%;
+        }
+
+        body {
+            background: radial-gradient(circle at top left, #eef6ff 0%, #f4f7fb 40%, #f8fafc 100%);
+        }
+
+        button, input, select {
+            font: inherit;
+        }
+
+        .btn-3d {
+            box-shadow: 0 4px 0 0 rgba(0,0,0,1);
+            transition: all 0.075s;
+        }
+
+        .btn-3d:active {
+            box-shadow: none;
+            transform: translateY(4px);
+        }
+
+        .btn-3d-secondary {
+            box-shadow: 0 4px 0 0 rgba(229,229,229,1);
+        }
+
+        .btn-3d-secondary:active {
+            box-shadow: none;
+            transform: translateY(4px);
+        }
+
+        .dark-mode {
+            background: #0a0a0a;
+            color: white;
+        }
+
+        .dark-mode .card {
+            background: #1a1a1a;
+            border-color: #333;
+        }
+
+        .tab-active {
+            background: #000;
+            color: white;
+        }
+
+        .dark-mode .tab-active {
+            background: white;
+            color: #000;
+        }
+
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-backdrop {
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-neutral-50">
+    <div id="app" class="min-h-screen">
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="min-h-screen bg-neutral-50 flex items-center justify-center hidden">
+            <div class="animate-spin w-8 h-8 border-4 border-neutral-300 border-t-neutral-900 rounded-full"></div>
+        </div>
+
+        <!-- Login Screen -->
+        <div id="login-screen" class="min-h-screen bg-neutral-50 flex flex-col items-center justify-center p-6 text-center">
+            <div class="max-w-md w-full bg-white p-8 rounded-3xl shadow-sm border border-neutral-100 fade-in">
+                <div class="w-24 h-24 bg-neutral-900 rounded-3xl flex items-center justify-center mx-auto mb-6 overflow-hidden">
+                    <div class="w-full h-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-2xl">
+                        RW
+                    </div>
+                </div>
+                <h1 class="text-3xl font-bold tracking-tight text-neutral-900 mb-2">RazifWallet</h1>
+                <p class="text-neutral-500 mb-8">Secure, simple, and smart e-wallet for your MYR and Bitcoin.</p>
+
+                <div class="space-y-4">
+                    <button onclick="handleLogin()" class="btn-3d w-full py-4 px-6 bg-neutral-900 text-white rounded-xl font-bold flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Sign in with Google
+                    </button>
+
+                    <button onclick="handleBiometricLogin()" id="biometric-btn" class="btn-3d-secondary w-full py-4 px-6 bg-white text-neutral-900 border border-neutral-200 rounded-xl font-bold flex items-center justify-center gap-2 hidden">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                        Biometric Login
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App -->
+        <div id="main-app" class="hidden">
+            <!-- Header -->
+            <header class="bg-white border-b border-neutral-100 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-neutral-900 rounded-xl flex items-center justify-center overflow-hidden">
+                        <div class="w-full h-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold">
+                            RW
+                        </div>
+                    </div>
+                    <div>
+                        <span class="font-bold text-lg tracking-tight block leading-none">RazifWallet</span>
+                        <span id="current-time" class="text-[10px] text-neutral-400 font-mono"></span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleDarkMode()" id="theme-btn" class="p-2 hover:bg-neutral-100 rounded-full transition-colors text-neutral-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                        </svg>
+                    </button>
+                    <button onclick="setActiveTab('assistant')" class="p-2 hover:bg-neutral-100 rounded-full transition-colors relative text-neutral-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-neutral-900 rounded-full border-2 border-white"></span>
+                    </button>
+                    <button onclick="handleLogout()" class="p-2 hover:bg-neutral-100 rounded-full transition-colors text-neutral-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Navigation -->
+            <nav class="bg-white border-b border-neutral-100 px-6 py-2 sticky top-16 z-10">
+                <div class="flex gap-1 overflow-x-auto">
+                    <button onclick="setActiveTab('home')" id="tab-home" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap tab-active">Home</button>
+                    <button onclick="setActiveTab('transfer')" id="tab-transfer" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap">Transfer</button>
+                    <button onclick="setActiveTab('swap')" id="tab-swap" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap">Swap</button>
+                    <button onclick="setActiveTab('history')" id="tab-history" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap">History</button>
+                    <button onclick="setActiveTab('cards')" id="tab-cards" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap">Cards</button>
+                    <button onclick="setActiveTab('forex')" id="tab-forex" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap">Forex</button>
+                </div>
+            </nav>
+
+            <!-- Content Area -->
+            <main class="p-6 pb-24">
+                <!-- Home Tab -->
+                <div id="home-tab" class="tab-content">
+                    <div class="grid gap-6 md:grid-cols-2">
+                        <!-- Balance Cards -->
+                        <div class="card bg-white p-6 rounded-2xl border border-neutral-100">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold text-neutral-900">MYR Balance</h3>
+                                <svg class="w-6 h-6 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                                </svg>
+                            </div>
+                            <div class="text-3xl font-bold text-neutral-900 mb-2" id="myr-balance">RM 1,000.00</div>
+                            <div class="text-sm text-neutral-500">Available balance</div>
+                        </div>
+
+                        <div class="card bg-white p-6 rounded-2xl border border-neutral-100">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold text-neutral-900">BTC Balance</h3>
+                                <svg class="w-6 h-6 text-orange-500" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                </svg>
+                            </div>
+                            <div class="text-3xl font-bold text-neutral-900 mb-2" id="btc-balance">0.00500000 BTC</div>
+                            <div class="text-sm text-neutral-500" id="btc-value">≈ RM 1,425.00</div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="mt-8">
+                        <h3 class="font-semibold text-neutral-900 mb-4">Quick Actions</h3>
+                        <div class="grid gap-4 md:grid-cols-3">
+                            <button onclick="showTransferModal('Deposit')" class="card bg-white p-6 rounded-2xl border border-neutral-100 hover:border-neutral-200 transition-colors text-left">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div class="font-semibold text-neutral-900">Deposit MYR</div>
+                                        <div class="text-sm text-neutral-500">Add money to wallet</div>
+                                    </div>
+                                </div>
+                            </button>
+
+                            <button onclick="showTransferModal('Transfer')" class="card bg-white p-6 rounded-2xl border border-neutral-100 hover:border-neutral-200 transition-colors text-left">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div class="font-semibold text-neutral-900">Transfer MYR</div>
+                                        <div class="text-sm text-neutral-500">Send money</div>
+                                    </div>
+                                </div>
+                            </button>
+
+                            <button onclick="setActiveTab('swap')" class="card bg-white p-6 rounded-2xl border border-neutral-100 hover:border-neutral-200 transition-colors text-left">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div class="font-semibold text-neutral-900">Swap Crypto</div>
+                                        <div class="text-sm text-neutral-500">Exchange currencies</div>
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Recent Transactions -->
+                    <div class="mt-8">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-neutral-900">Recent Transactions</h3>
+                            <button onclick="setActiveTab('history')" class="text-sm text-neutral-500 hover:text-neutral-700">View all</button>
+                        </div>
+                        <div id="recent-transactions" class="space-y-3">
+                            <!-- Transactions will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transfer Tab -->
+                <div id="transfer-tab" class="tab-content hidden">
+                    <div class="max-w-md mx-auto">
+                        <h2 class="text-2xl font-bold text-neutral-900 mb-6">Transfer Money</h2>
+                        <div class="space-y-4">
+                            <button onclick="showTransferModal('Deposit')" class="btn-3d w-full py-4 px-6 bg-green-600 text-white rounded-xl font-bold flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                Deposit MYR
+                            </button>
+                            <button onclick="showTransferModal('Transfer')" class="btn-3d w-full py-4 px-6 bg-blue-600 text-white rounded-xl font-bold flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                                </svg>
+                                Transfer MYR
+                            </button>
+                            <button onclick="showTransferModal('BTC Transfer')" class="btn-3d w-full py-4 px-6 bg-orange-600 text-white rounded-xl font-bold flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                </svg>
+                                Transfer BTC
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Swap Tab -->
+                <div id="swap-tab" class="tab-content hidden">
+                    <div class="max-w-md mx-auto">
+                        <h2 class="text-2xl font-bold text-neutral-900 mb-6">Swap Cryptocurrency</h2>
+                        <div class="card bg-white p-6 rounded-2xl border border-neutral-100">
+                            <div class="flex items-center justify-between mb-4">
+                                <button onclick="setSwapMode('MYRtoBTC')" id="myr-to-btc-btn" class="flex-1 py-2 px-4 rounded-lg font-medium text-sm bg-neutral-900 text-white">MYR → BTC</button>
+                                <button onclick="setSwapMode('BTCtoMYR')" id="btc-to-myr-btn" class="flex-1 py-2 px-4 rounded-lg font-medium text-sm bg-neutral-100 text-neutral-600">BTC → MYR</button>
+                            </div>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-neutral-700 mb-2">Amount</label>
+                                    <input type="number" id="swap-amount" placeholder="Enter amount" class="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900">
+                                </div>
+                                <div class="text-sm text-neutral-500" id="swap-rate">1 BTC = RM 285,000.00</div>
+                                <button onclick="handleSwap()" class="btn-3d w-full py-4 px-6 bg-neutral-900 text-white rounded-xl font-bold">
+                                    Swap Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Tab -->
+                <div id="history-tab" class="tab-content hidden">
+                    <h2 class="text-2xl font-bold text-neutral-900 mb-6">Transaction History</h2>
+                    <div id="transaction-history" class="space-y-3">
+                        <!-- Full transaction history will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Cards Tab -->
+                <div id="cards-tab" class="tab-content hidden">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-neutral-900">My Cards</h2>
+                        <button onclick="showAddCardModal()" class="btn-3d py-2 px-4 bg-neutral-900 text-white rounded-lg font-medium text-sm flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Add Card
+                        </button>
+                    </div>
+                    <div id="cards-list" class="grid gap-4 md:grid-cols-2">
+                        <!-- Cards will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Forex Tab -->
+                <div id="forex-tab" class="tab-content hidden">
+                    <h2 class="text-2xl font-bold text-neutral-900 mb-6">Forex Trading</h2>
+                    <div class="grid gap-6 md:grid-cols-2">
+                        <div class="card bg-white p-6 rounded-2xl border border-neutral-100">
+                            <h3 class="font-semibold text-neutral-900 mb-4">USD/MYR</h3>
+                            <div class="text-2xl font-bold text-neutral-900 mb-2" id="usd-myr-rate">4.72</div>
+                            <button onclick="showForexTradeModal('USD/MYR', 4.72)" class="btn-3d w-full py-2 px-4 bg-neutral-900 text-white rounded-lg font-medium text-sm">
+                                Trade USD/MYR
+                            </button>
+                        </div>
+                        <div class="card bg-white p-6 rounded-2xl border border-neutral-100">
+                            <h3 class="font-semibold text-neutral-900 mb-4">EUR/MYR</h3>
+                            <div class="text-2xl font-bold text-neutral-900 mb-2" id="eur-myr-rate">5.12</div>
+                            <button onclick="showForexTradeModal('EUR/MYR', 5.12)" class="btn-3d w-full py-2 px-4 bg-neutral-900 text-white rounded-lg font-medium text-sm">
+                                Trade EUR/MYR
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assistant Tab -->
+                <div id="assistant-tab" class="tab-content hidden">
+                    <h2 class="text-2xl font-bold text-neutral-900 mb-6">AI Assistant</h2>
+                    <div class="max-w-2xl mx-auto">
+                        <div id="chat-messages" class="space-y-4 mb-4 max-h-96 overflow-y-auto">
+                            <!-- Chat messages will be populated here -->
+                        </div>
+                        <div class="flex gap-2">
+                            <input type="text" id="chat-input" placeholder="Ask me anything about your finances..." class="flex-1 px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900">
+                            <button onclick="sendChatMessage()" id="send-btn" class="btn-3d py-3 px-6 bg-neutral-900 text-white rounded-xl font-medium">
+                                Send
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Transfer Modal -->
+    <div id="transfer-modal" class="fixed inset-0 bg-black bg-opacity-50 modal-backdrop hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-neutral-900" id="transfer-modal-title">Transfer Money</h3>
+                <button onclick="closeModal('transfer-modal')" class="p-2 hover:bg-neutral-100 rounded-full">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div id="transfer-form">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-neutral-700 mb-2" id="transfer-label">Amount (MYR)</label>
+                        <input type="number" id="transfer-amount" placeholder="Enter amount" class="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900">
+                    </div>
+                    <div class="mb-4" id="destination-field">
+                        <label class="block text-sm font-medium text-neutral-700 mb-2">Destination</label>
+                        <input type="text" id="transfer-destination" placeholder="Phone number or account" class="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900">
+                    </div>
+                    <button onclick="executeTransfer()" class="btn-3d w-full py-4 px-6 bg-neutral-900 text-white rounded-xl font-bold">
+                        Confirm Transfer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Card Modal -->
+    <div id="add-card-modal" class="fixed inset-0 bg-black bg-opacity-50 modal-backdrop hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-neutral-900">Add New Card</h3>
+                <button onclick="closeModal('add-card-modal')" class="p-2 hover:bg-neutral-100 rounded-full">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-neutral-700 mb-2">Card Type</label>
+                    <select id="card-type" class="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900">
+                        <option value="visa">Visa</option>
+                        <option value="mastercard">Mastercard</option>
+                        <option value="amex">American Express</option>
+                        <option value="debit">Debit Card</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-neutral-700 mb-2">Card Number</label>
+                    <input type="text" id="card-number" placeholder="1234 5678 9012 3456" class="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-neutral-700 mb-2">Expiry Date</label>
+                    <input type="text" id="card-expiry" placeholder="MM/YY" class="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-neutral-700 mb-2">Cardholder Name</label>
+                    <input type="text" id="card-name" placeholder="John Doe" class="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900">
+                </div>
+                <button onclick="addCard()" class="btn-3d w-full py-4 px-6 bg-neutral-900 text-white rounded-xl font-bold">
+                    Add Card
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forex Trade Modal -->
+    <div id="forex-modal" class="fixed inset-0 bg-black bg-opacity-50 modal-backdrop hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-neutral-900" id="forex-modal-title">Trade Forex</h3>
+                <button onclick="closeModal('forex-modal')" class="p-2 hover:bg-neutral-100 rounded-full">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-neutral-700 mb-2">Amount (MYR)</label>
+                    <input type="number" id="forex-amount" placeholder="Enter amount" class="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900">
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="setForexType('buy')" id="buy-btn" class="flex-1 py-3 px-4 bg-green-600 text-white rounded-xl font-medium">Buy</button>
+                    <button onclick="setForexType('sell')" id="sell-btn" class="flex-1 py-3 px-4 bg-neutral-100 text-neutral-600 rounded-xl font-medium">Sell</button>
+                </div>
+                <button onclick="executeForexTrade()" class="btn-3d w-full py-4 px-6 bg-neutral-900 text-white rounded-xl font-bold">
+                    Execute Trade
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State management
+        let currentUser = null;
+        let userProfile = null;
+        let transactions = [];
+        let cards = [];
+        let forexTrades = [];
+        let chatMessages = [];
+        let activeTab = 'home';
+        let isDarkMode = localStorage.getItem('dark_mode') === 'true';
+        let currentTransferType = null;
+        let currentForexPair = null;
+        let currentForexPrice = null;
+        let currentForexType = 'buy';
+
+        // Constants
+        const BTC_PRICE_MYR = 285000;
+        const USD_MYR = 4.72;
+        const EUR_MYR = 5.12;
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            updateTime();
+            setInterval(updateTime, 1000);
+        });
+
+        function initializeApp() {
+            // Check if user is logged in (simulated)
+            const savedUser = localStorage.getItem('user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                userProfile = JSON.parse(localStorage.getItem('profile') || '{}');
+                transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+                cards = JSON.parse(localStorage.getItem('cards') || '[]');
+                forexTrades = JSON.parse(localStorage.getItem('forexTrades') || '[]');
+                chatMessages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
+                showMainApp();
+                updateUI();
+            } else {
+                showLoginScreen();
+            }
+
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+                document.getElementById('theme-btn').innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>';
+            }
+        }
+
+        function showLoginScreen() {
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('main-app').classList.add('hidden');
+            document.getElementById('loading-screen').classList.add('hidden');
+        }
+
+        function showMainApp() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            document.getElementById('loading-screen').classList.add('hidden');
+        }
+
+        function handleLogin() {
+            // Simulate Google login
+            currentUser = {
+                uid: 'user-' + Date.now(),
+                email: 'user@example.com',
+                displayName: 'Demo User'
+            };
+
+            // Initialize default profile
+            userProfile = {
+                uid: currentUser.uid,
+                email: currentUser.email,
+                displayName: currentUser.displayName,
+                balanceMYR: 1000,
+                balanceBTC: 0.005,
+                createdAt: new Date().toISOString()
+            };
+
+            // Initialize default transactions
+            transactions = [
+                {
+                    id: 'tx-1',
+                    userId: currentUser.uid,
+                    type: 'deposit',
+                    subType: 'Deposit',
+                    amount: 1000,
+                    currency: 'MYR',
+                    status: 'completed',
+                    timestamp: new Date().toISOString()
+                }
+            ];
+
+            // Save to localStorage
+            localStorage.setItem('user', JSON.stringify(currentUser));
+            localStorage.setItem('profile', JSON.stringify(userProfile));
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            localStorage.setItem('cards', JSON.stringify(cards));
+            localStorage.setItem('forexTrades', JSON.stringify(forexTrades));
+            localStorage.setItem('chatMessages', JSON.stringify(chatMessages));
+
+            showMainApp();
+            updateUI();
+        }
+
+        function handleBiometricLogin() {
+            // Simulate biometric authentication
+            document.getElementById('loading-screen').classList.remove('hidden');
+            setTimeout(() => {
+                handleLogin();
+            }, 2000);
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            userProfile = null;
+            localStorage.clear();
+            showLoginScreen();
+        }
+
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            localStorage.setItem('dark_mode', isDarkMode.toString());
+
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+                document.getElementById('theme-btn').innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>';
+            } else {
+                document.body.classList.remove('dark-mode');
+                document.getElementById('theme-btn').innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>';
+            }
+        }
+
+        function setActiveTab(tab) {
+            activeTab = tab;
+
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('tab-active'));
+
+            // Show active tab
+            document.getElementById(tab + '-tab').classList.remove('hidden');
+            document.getElementById('tab-' + tab).classList.add('tab-active');
+        }
+
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = now.toLocaleDateString() + ' • ' + now.toLocaleTimeString();
+        }
+
+        function updateUI() {
+            if (!userProfile) return;
+
+            // Update balances
+            document.getElementById('myr-balance').textContent = 'RM ' + userProfile.balanceMYR.toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('btc-balance').textContent = userProfile.balanceBTC.toFixed(8) + ' BTC';
+            document.getElementById('btc-value').textContent = '≈ RM ' + (userProfile.balanceBTC * BTC_PRICE_MYR).toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            // Update recent transactions
+            updateRecentTransactions();
+
+            // Update transaction history
+            updateTransactionHistory();
+
+            // Update cards
+            updateCards();
+
+            // Update forex rates
+            document.getElementById('usd-myr-rate').textContent = USD_MYR.toFixed(2);
+            document.getElementById('eur-myr-rate').textContent = EUR_MYR.toFixed(2);
+        }
+
+        function updateRecentTransactions() {
+            const container = document.getElementById('recent-transactions');
+            container.innerHTML = '';
+
+            const recent = transactions.slice(-5).reverse();
+            recent.forEach(tx => {
+                const txElement = document.createElement('div');
+                txElement.className = 'flex items-center justify-between p-4 bg-white rounded-xl border border-neutral-100';
+                txElement.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 ${getTransactionIconColor(tx.type)} rounded-full flex items-center justify-center">
+                            ${getTransactionIcon(tx.type)}
+                        </div>
+                        <div>
+                            <div class="font-medium text-neutral-900">${tx.subType || tx.type}</div>
+                            <div class="text-sm text-neutral-500">${new Date(tx.timestamp).toLocaleDateString()}</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-semibold ${tx.amount > 0 ? 'text-green-600' : 'text-red-600'}">
+                            ${tx.amount > 0 ? '+' : ''}RM ${Math.abs(tx.amount).toFixed(2)}
+                        </div>
+                        <div class="text-sm text-neutral-500">${tx.currency}</div>
+                    </div>
+                `;
+                container.appendChild(txElement);
+            });
+        }
+
+        function updateTransactionHistory() {
+            const container = document.getElementById('transaction-history');
+            container.innerHTML = '';
+
+            transactions.slice().reverse().forEach(tx => {
+                const txElement = document.createElement('div');
+                txElement.className = 'flex items-center justify-between p-4 bg-white rounded-xl border border-neutral-100';
+                txElement.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 ${getTransactionIconColor(tx.type)} rounded-full flex items-center justify-center">
+                            ${getTransactionIcon(tx.type)}
+                        </div>
+                        <div>
+                            <div class="font-medium text-neutral-900">${tx.subType || tx.type}</div>
+                            <div class="text-sm text-neutral-500">${new Date(tx.timestamp).toLocaleDateString()} ${new Date(tx.timestamp).toLocaleTimeString()}</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-semibold ${tx.amount > 0 ? 'text-green-600' : 'text-red-600'}">
+                            ${tx.amount > 0 ? '+' : ''}${tx.currency === 'MYR' ? 'RM ' : ''}${Math.abs(tx.amount).toFixed(tx.currency === 'BTC' ? 8 : 2)} ${tx.currency === 'BTC' ? 'BTC' : ''}
+                        </div>
+                        <div class="text-sm text-neutral-500">${tx.status}</div>
+                    </div>
+                `;
+                container.appendChild(txElement);
+            });
+        }
+
+        function updateCards() {
+            const container = document.getElementById('cards-list');
+            container.innerHTML = '';
+
+            cards.forEach(card => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'card bg-gradient-to-br from-blue-600 to-purple-600 p-6 rounded-2xl text-white';
+                cardElement.innerHTML = `
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-lg font-bold">${card.type.toUpperCase()}</div>
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10"/>
+                            <circle cx="12" cy="12" r="4"/>
+                        </svg>
+                    </div>
+                    <div class="text-xl font-mono mb-4">${card.last4}</div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-sm opacity-80">Cardholder</div>
+                            <div class="font-semibold">${card.cardholderName}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm opacity-80">Expires</div>
+                            <div class="font-semibold">${card.expiry}</div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(cardElement);
+            });
+        }
+
+        function getTransactionIcon(type) {
+            switch (type) {
+                case 'deposit': return '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>';
+                case 'withdraw': return '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>';
+                case 'transfer': return '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>';
+                case 'swap': return '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>';
+                case 'trade': return '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>';
+                default: return '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/></svg>';
+            }
+        }
+
+        function getTransactionIconColor(type) {
+            switch (type) {
+                case 'deposit': return 'bg-green-100 text-green-600';
+                case 'withdraw': return 'bg-red-100 text-red-600';
+                case 'transfer': return 'bg-blue-100 text-blue-600';
+                case 'swap': return 'bg-purple-100 text-purple-600';
+                case 'trade': return 'bg-orange-100 text-orange-600';
+                default: return 'bg-neutral-100 text-neutral-600';
+            }
+        }
+
+        function showTransferModal(type) {
+            currentTransferType = type;
+            document.getElementById('transfer-modal-title').textContent = type;
+
+            const amountLabel = document.getElementById('transfer-label');
+            const destinationField = document.getElementById('destination-field');
+
+            if (type === 'Deposit') {
+                amountLabel.textContent = 'Amount (MYR)';
+                destinationField.style.display = 'none';
+            } else if (type === 'BTC Transfer') {
+                amountLabel.textContent = 'Amount (BTC)';
+                destinationField.style.display = 'block';
+            } else {
+                amountLabel.textContent = 'Amount (MYR)';
+                destinationField.style.display = 'block';
+            }
+
+            document.getElementById('transfer-modal').classList.remove('hidden');
+        }
+
+        function executeTransfer() {
+            const amount = parseFloat(document.getElementById('transfer-amount').value);
+            const destination = document.getElementById('transfer-destination').value;
+
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid amount');
+                return;
+            }
+
+            if (currentTransferType !== 'Deposit' && !destination) {
+                alert('Please enter a destination');
+                return;
+            }
+
+            if (currentTransferType === 'BTC Transfer') {
+                if (userProfile.balanceBTC < amount) {
+                    alert('Insufficient BTC balance');
+                    return;
+                }
+                userProfile.balanceBTC -= amount;
+            } else {
+                if (currentTransferType !== 'Deposit' && userProfile.balanceMYR < amount) {
+                    alert('Insufficient MYR balance');
+                    return;
+                }
+                if (currentTransferType === 'Deposit') {
+                    userProfile.balanceMYR += amount;
+                } else {
+                    userProfile.balanceMYR -= amount;
+                }
+            }
+
+            const transaction = {
+                id: 'tx-' + Date.now(),
+                userId: currentUser.uid,
+                type: currentTransferType === 'Deposit' ? 'deposit' : currentTransferType === 'BTC Transfer' ? 'transfer' : 'transfer',
+                subType: currentTransferType,
+                amount: currentTransferType === 'Deposit' ? amount : -amount,
+                currency: currentTransferType === 'BTC Transfer' ? 'BTC' : 'MYR',
+                destination: destination,
+                status: 'completed',
+                timestamp: new Date().toISOString()
+            };
+
+            transactions.push(transaction);
+
+            // Save to localStorage
+            localStorage.setItem('profile', JSON.stringify(userProfile));
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+
+            updateUI();
+            closeModal('transfer-modal');
+            document.getElementById('transfer-amount').value = '';
+            document.getElementById('transfer-destination').value = '';
+        }
+
+        function setSwapMode(mode) {
+            document.getElementById('myr-to-btc-btn').classList.toggle('bg-neutral-900', mode === 'MYRtoBTC');
+            document.getElementById('myr-to-btc-btn').classList.toggle('text-white', mode === 'MYRtoBTC');
+            document.getElementById('myr-to-btc-btn').classList.toggle('bg-neutral-100', mode !== 'MYRtoBTC');
+            document.getElementById('myr-to-btc-btn').classList.toggle('text-neutral-600', mode !== 'MYRtoBTC');
+
+            document.getElementById('btc-to-myr-btn').classList.toggle('bg-neutral-900', mode === 'BTCtoMYR');
+            document.getElementById('btc-to-myr-btn').classList.toggle('text-white', mode === 'BTCtoMYR');
+            document.getElementById('btc-to-myr-btn').classList.toggle('bg-neutral-100', mode !== 'BTCtoMYR');
+            document.getElementById('btc-to-myr-btn').classList.toggle('text-neutral-600', mode !== 'BTCtoMYR');
+
+            document.getElementById('swap-rate').textContent = mode === 'MYRtoBTC' ? '1 BTC = RM 285,000.00' : '1 MYR = ' + (1 / BTC_PRICE_MYR).toFixed(8) + ' BTC';
+        }
+
+        function handleSwap() {
+            const amount = parseFloat(document.getElementById('swap-amount').value);
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid amount');
+                return;
+            }
+
+            const isMYRtoBTC = document.getElementById('myr-to-btc-btn').classList.contains('bg-neutral-900');
+
+            if (isMYRtoBTC) {
+                if (userProfile.balanceMYR < amount) {
+                    alert('Insufficient MYR balance');
+                    return;
+                }
+                const btcAmount = amount / BTC_PRICE_MYR;
+                userProfile.balanceMYR -= amount;
+                userProfile.balanceBTC += btcAmount;
+
+                transactions.push({
+                    id: 'tx-' + Date.now(),
+                    userId: currentUser.uid,
+                    type: 'swap',
+                    subType: 'MYR to BTC',
+                    amount: -amount,
+                    currency: 'MYR',
+                    targetAmount: btcAmount,
+                    targetCurrency: 'BTC',
+                    status: 'completed',
+                    timestamp: new Date().toISOString()
+                });
+            } else {
+                if (userProfile.balanceBTC < amount) {
+                    alert('Insufficient BTC balance');
+                    return;
+                }
+                const myrAmount = amount * BTC_PRICE_MYR;
+                userProfile.balanceBTC -= amount;
+                userProfile.balanceMYR += myrAmount;
+
+                transactions.push({
+                    id: 'tx-' + Date.now(),
+                    userId: currentUser.uid,
+                    type: 'swap',
+                    subType: 'BTC to MYR',
+                    amount: amount,
+                    currency: 'BTC',
+                    targetAmount: myrAmount,
+                    targetCurrency: 'MYR',
+                    status: 'completed',
+                    timestamp: new Date().toISOString()
+                });
+            }
+
+            localStorage.setItem('profile', JSON.stringify(userProfile));
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+
+            updateUI();
+            document.getElementById('swap-amount').value = '';
+            setActiveTab('home');
+        }
+
+        function showAddCardModal() {
+            document.getElementById('add-card-modal').classList.remove('hidden');
+        }
+
+        function addCard() {
+            const type = document.getElementById('card-type').value;
+            const number = document.getElementById('card-number').value.replace(/\s/g, '');
+            const expiry = document.getElementById('card-expiry').value;
+            const name = document.getElementById('card-name').value;
+
+            if (!number || !expiry || !name) {
+                alert('Please fill all fields');
+                return;
+            }
+
+            const card = {
+                id: 'card-' + Date.now(),
+                userId: currentUser.uid,
+                type: type,
+                last4: number.slice(-4),
+                expiry: expiry,
+                cardholderName: name,
+                addedAt: new Date().toISOString()
+            };
+
+            cards.push(card);
+
+            localStorage.setItem('cards', JSON.stringify(cards));
+            updateCards();
+            closeModal('add-card-modal');
+
+            // Clear form
+            document.getElementById('card-type').value = 'visa';
+            document.getElementById('card-number').value = '';
+            document.getElementById('card-expiry').value = '';
+            document.getElementById('card-name').value = '';
+        }
+
+        function showForexTradeModal(pair, price) {
+            currentForexPair = pair;
+            currentForexPrice = price;
+            document.getElementById('forex-modal-title').textContent = 'Trade ' + pair;
+            document.getElementById('forex-modal').classList.remove('hidden');
+        }
+
+        function setForexType(type) {
+            currentForexType = type;
+            document.getElementById('buy-btn').classList.toggle('bg-green-600', type === 'buy');
+            document.getElementById('buy-btn').classList.toggle('text-white', type === 'buy');
+            document.getElementById('buy-btn').classList.toggle('bg-neutral-100', type !== 'buy');
+            document.getElementById('buy-btn').classList.toggle('text-neutral-600', type !== 'buy');
+
+            document.getElementById('sell-btn').classList.toggle('bg-red-600', type === 'sell');
+            document.getElementById('sell-btn').classList.toggle('text-white', type === 'sell');
+            document.getElementById('sell-btn').classList.toggle('bg-neutral-100', type !== 'sell');
+            document.getElementById('sell-btn').classList.toggle('text-neutral-600', type !== 'sell');
+        }
+
+        function executeForexTrade() {
+            const amount = parseFloat(document.getElementById('forex-amount').value);
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid amount');
+                return;
+            }
+
+            if (userProfile.balanceMYR < amount) {
+                alert('Insufficient MYR balance');
+                return;
+            }
+
+            userProfile.balanceMYR -= amount;
+
+            const trade = {
+                id: 'trade-' + Date.now(),
+                userId: currentUser.uid,
+                pair: currentForexPair,
+                type: currentForexType,
+                entryPrice: currentForexPrice,
+                amount: amount,
+                status: 'open',
+                timestamp: new Date().toISOString()
+            };
+
+            forexTrades.push(trade);
+
+            transactions.push({
+                id: 'tx-' + Date.now(),
+                userId: currentUser.uid,
+                type: 'trade',
+                subType: `Forex ${currentForexType.toUpperCase()} ${currentForexPair}`,
+                amount: -amount,
+                currency: 'MYR',
+                status: 'completed',
+                timestamp: new Date().toISOString()
+            });
+
+            localStorage.setItem('profile', JSON.stringify(userProfile));
+            localStorage.setItem('forexTrades', JSON.stringify(forexTrades));
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+
+            updateUI();
+            closeModal('forex-modal');
+            document.getElementById('forex-amount').value = '';
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            chatMessages.push({ role: 'user', text: message });
+            input.value = '';
+
+            // Simulate AI response
+            setTimeout(() => {
+                let response = '';
+                if (message.toLowerCase().includes('balance')) {
+                    response = `Your current balance is RM ${userProfile.balanceMYR.toFixed(2)} and ${userProfile.balanceBTC.toFixed(8)} BTC (≈ RM ${(userProfile.balanceBTC * BTC_PRICE_MYR).toFixed(2)}).`;
+                } else if (message.toLowerCase().includes('btc') || message.toLowerCase().includes('bitcoin')) {
+                    response = `Bitcoin is currently priced at RM ${BTC_PRICE_MYR.toLocaleString()}. You can swap MYR to BTC or vice versa in the Swap tab.`;
+                } else if (message.toLowerCase().includes('transfer')) {
+                    response = `You can transfer money using the Transfer tab. Make sure you have sufficient balance before transferring.`;
+                } else {
+                    response = "I'm here to help with your financial queries. You can ask me about your balance, Bitcoin prices, transfers, or any other financial questions!";
+                }
+
+                chatMessages.push({ role: 'model', text: response });
+                localStorage.setItem('chatMessages', JSON.stringify(chatMessages));
+                updateChatMessages();
+            }, 1000);
+
+            updateChatMessages();
+            localStorage.setItem('chatMessages', JSON.stringify(chatMessages));
+        }
+
+        function updateChatMessages() {
+            const container = document.getElementById('chat-messages');
+            container.innerHTML = '';
+
+            chatMessages.forEach(msg => {
+                const msgElement = document.createElement('div');
+                msgElement.className = `flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`;
+                msgElement.innerHTML = `
+                    <div class="max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${msg.role === 'user' ? 'bg-neutral-900 text-white' : 'bg-neutral-100 text-neutral-900'}">
+                        ${msg.text}
+                    </div>
+                `;
+                container.appendChild(msgElement);
+            });
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // Initialize with home tab active
+        setActiveTab('home');
+    </script>
+</body>
+</html>
+
