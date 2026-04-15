@@ -58,3 +58,30 @@ The portable version is perfect for:
 - Development testing
 - Quick prototyping
 - Educational purposes
+
+## Deployment to aiapp.nasadef.com.my
+
+The application is automatically deployed to https://aiapp.nasadef.com.my
+
+### Auto Deployment Setup:
+- **Server**: ftp.nasadef.com.my
+- **User**: razif@nasadef.com.my
+- **Path**: /public_html/aiapp/
+- **Format**: Node.js app (app.js)
+
+### Manual Deployment:
+```bash
+# Install dependencies
+npm install
+
+# Run deployment script
+node deploy.js
+```
+
+### Files Deployed:
+- `index.html` - Portable wallet application
+- `app.js` - Node.js server
+- `package.json` - Dependencies
+- `.htaccess` - Apache configuration
+
+The app should be available at: https://aiapp.nasadef.com.my
